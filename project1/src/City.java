@@ -11,7 +11,14 @@ public class City {
         this.longitude = Float.parseFloat(arr[3]);
     }
     public String[] parseline(String line){
-        String[] splitter = line.split(" ");
+        String[] splitter = line.split("\\s+");
         return splitter;
+    }
+
+    @Override
+    public String toString() {
+        return "City{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }
