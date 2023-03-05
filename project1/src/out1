@@ -1,0 +1,12 @@
+Breadth-First Search Results:
+Olympia
+Boise
+SaltLakeCity
+That took 2 hops to find
+Total distance =  1264 miles.
+Depth-First Search Results:
+Olympia
+Helena
+SaltLakeCity
+That took 2 hops to find
+Total distance =  1671 miles.
