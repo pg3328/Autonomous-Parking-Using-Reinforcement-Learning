@@ -1,11 +1,19 @@
+
 Breadth-First Search Results:
 Olympia
 Boise
 SaltLakeCity
 That took 2 hops to find
-Total distance =  1264 miles.Depth-First Search Results:
+Total distance =  1264 miles.
+
+Depth-First Search Results:
 Olympia
-Helena
+Boise
 SaltLakeCity
 That took 2 hops to find
-Total distance =  1671 miles.
+Total distance =  1264 miles.
+
+A* Search Results:
+SaltLakeCity
+That took0hops to find.
+Total Distance = null miles.
