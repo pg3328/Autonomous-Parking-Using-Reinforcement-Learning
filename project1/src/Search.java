@@ -1,22 +1,33 @@
 import java.io.*;
 import java.util.*;
-
 import static java.lang.Math.round;
 
-
+/**
+ * Search class to search between two cities from a given input list.
+ * @author Pradeep Kumar Gontla.
+ */
 public class Search {
 
     public LinkedList<LinkedList<City>> adjacencyList = new LinkedList<>();
     public HashMap<String,Double> distanceMap = new HashMap<>();
 
 
-
+    /**
+     * adds the nodes to the adjacency list.
+     * @param city city object to be added.
+     */
     public void addNodes(City city){
         LinkedList<City> b = new LinkedList<>();
         b.add(city);
         adjacencyList.add(b);
     }
 
+    /**
+     * calculates the distance between parent and child objects
+     * @param parent parent object
+     * @param child child object
+     * @return the distance between two cities.
+     */
     public double calculateDistance(City parent, City child){
         float lat1 = parent.latitude;
         float lat2 = child.latitude;
@@ -24,6 +35,12 @@ public class Search {
         float lon2 = child.longitude;
         return Math.sqrt( Math.pow((lat1-lat2),2) + Math.pow((lon1-lon2),2))* 100;
     }
+
+    /**
+     * Adds edges to the nodes created.
+     * @param parent parent city name
+     * @param child child city name.
+     */
     public void addEdge(String parent, String child){
         int parIndex =-1;
         int childIndex=-1;
@@ -41,6 +58,9 @@ public class Search {
 
     }
 
+    /**
+     * adds edges to the graph created.
+     */
     public void readEdges(){
         try {
             FileReader fr = new FileReader("C:\\Users\\Pradeep Gontla\\OneDrive - rit.edu\\Documents\\GitHub\\ArtificialIntelligence\\project1\\src\\edge.dat");
@@ -53,13 +73,17 @@ public class Search {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println("File not found: edge.dat");
+            System.err.println("File not found: edge.dat");
+            System.exit(0);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
+    /**
+     * reads the cities form the given filename and adds the nodes to adjacency list.
+     */
     public void readCities(){
         try {
             FileReader fr = new FileReader("C:\\Users\\Pradeep Gontla\\OneDrive - rit.edu\\Documents\\GitHub\\ArtificialIntelligence\\project1\\src\\city.dat");
@@ -72,13 +96,20 @@ public class Search {
 
 
         } catch (FileNotFoundException e) {
-            System.out.println("File not found: city.dat");
+            System.err.println("File not found: city.dat");
+            System.exit(0);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
 
     }
+
+    /**
+     * finds the index based on city name provided.
+     * @param start String format of city for which the index to be found.
+     * @return index of the city in adjacency list / -1 if the city not found.
+     */
     public int indexFromLine(String start){
         for(int i=0;i<adjacencyList.size();i++){
             if(adjacencyList.get(i).get(0).name.equals(start)) return i;
@@ -86,12 +117,24 @@ public class Search {
         return -1;
     }
 
+    /**
+     * finds the index given a city object.
+     * @param city city object for which the index to be found.
+     * @return index of the city in graph / -1 if not found.
+     */
+
     public int findIndex(City city){
         for(int i=0;i<adjacencyList.size();i++){
             if(adjacencyList.get(i).get(0)==city) return i;
         }
         return -1;
     }
+
+    /**
+     * calculates distance for a given path.
+     * @param pathList path of dfs/bfs.
+     * @return solution path cost
+     */
     public double findTheDistance(ArrayList<City> pathList) {
         double distance =0.0;
         for(int i=0;i<pathList.size()-1;i++){
@@ -101,9 +144,18 @@ public class Search {
 
     }
 
+    /**
+     * dfs for the given search inputs.
+     * @param start start city for the search.
+     * @param end destination city for the search.
+     * @param writer writes the output to the given output file.
+     * @throws IOException exception thrown if the writer object input output is not found.
+     */
+
     public void dfs(String start, String end, FileWriter writer) throws IOException {
         int startIndex = indexFromLine(start);
-        if(startIndex!=-1){
+        int endIndex = indexFromLine(end);
+        if(startIndex!=-1 && endIndex!=-1){
             Stack<City> stack = new Stack<>();
             HashMap<City,City> parentMap = new HashMap<>();
             ArrayList<City> pathList = new ArrayList<>();
@@ -123,7 +175,6 @@ public class Search {
                         parentMap.put(city,current);
                 }
             }}
-            int endIndex = indexFromLine(end);
             City star = adjacencyList.get(endIndex).get(0);
             while(star!=null){
                 pathList.add(0,star);
@@ -141,12 +192,23 @@ public class Search {
 
         }
         else{
-            System.out.println("Start city is not in the list");
+            if(startIndex==-1) System.err.println("No such city "+start);
+            else System.err.println("No such city "+end);
+            System.exit(0);
         }
     }
+
+    /**
+     * bfs for the given search inputs.
+     * @param start start city for the search.
+     * @param end destination city for the search.
+     * @param writer writes the output to the given output file.
+     * @throws IOException exception thrown if the writer object input output is not found.
+     */
     public void bfs(String start, String end, FileWriter writer) throws IOException {
         int startIndex = indexFromLine(start);
-        if(startIndex!=-1){
+        int endIndex = indexFromLine(end);
+        if(startIndex!=-1 && endIndex!=-1){
             LinkedList<City> queue = new LinkedList<>();
             HashMap<City,City> parentMap = new HashMap<>();
             queue.add(adjacencyList.get(startIndex).get(0));
@@ -167,7 +229,6 @@ public class Search {
                         parentMap.put(city,star);
                     }
                 }}
-            int endIndex = indexFromLine(end);
             City star = adjacencyList.get(endIndex).get(0);
             while(star!=null){
                 pathList.add(0,star);
@@ -184,47 +245,77 @@ public class Search {
             writer.flush();
         }
         else{
-            System.out.println("Start city is not in the list");
+            if(startIndex==-1) System.err.println("No such city "+start);
+            else System.err.println("No such city "+end);
+            System.exit(0);
         }
     }
 
-    public void performBreadthFirstSearch(String input_filename , FileWriter writer){
+    /**
+     * driver for the breadth first search.
+     * @param input input file name
+     * @param writer writes the output to the provided output file.
+     */
+    public void performBreadthFirstSearch(String input , FileWriter writer){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(input_filename));
+            BufferedReader reader = new BufferedReader(new FileReader(input));
             String start = reader.readLine();
             String end = reader.readLine();
             bfs(start,end,writer);
-
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: "+input_filename);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        }
+        catch (FileNotFoundException ignored){
+            System.err.println(" File not found: "+input);
+            System.exit(0);
+        }
+        catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
-    public void performDepthFirstSearch(String inputFileName , FileWriter writer)  {
+
+    /**
+     * driver for the depth first search.
+     * @param input input file name
+     * @param writer writes the output to the provided output file.
+     */
+    public void performDepthFirstSearch(String input, FileWriter writer)  {
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(inputFileName));
+            BufferedReader reader = new BufferedReader(new FileReader(input));
             String start = reader.readLine();
             String end = reader.readLine();
             dfs(start,end,writer);
         }
-        catch (FileNotFoundException e) {
-            System.out.println("File not found: output file ");
-            System.exit(-1);
+        catch (FileNotFoundException ignored){
+            System.err.println(" File not found: "+input);
+            System.exit(0);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
-    public float euclideanDistance(float currentLatitude, float currentLongitude, float endLatitude, float endLongitude)
+    /**
+     * euclidean distance between two cities
+     * @param currentLatitude latitude of a current city
+     * @param currentLongitude longitude of a current city
+     * @param endLatitude destination latitude
+     * @param endLongitude destination longitude
+     * @return euclidean distance calculated with the formula.
+     */
+    public double euclideanDistance(float currentLatitude, float currentLongitude, float endLatitude, float endLongitude)
     {
-        return (float) Math.sqrt(Math.pow((endLatitude-currentLatitude),2)+Math.pow((endLongitude-currentLongitude),2));
+        return (double) Math.sqrt(Math.pow((endLatitude-currentLatitude),2)+Math.pow((endLongitude-currentLongitude),2));
 
     }
 
-    public HashMap<City, Float> createHeuristics(float latitude , float longitude){
-        HashMap<City,Float> heuristic = new HashMap<>();
+    /**
+     * create heuristic dictionary with the required distance.
+     * @param latitude latitude of the destination city.
+     * @param longitude longitude of the start city.
+     * @return dictionary with the distance between city and destination.
+     */
+    public HashMap<City, Double> createHeuristics(float latitude , float longitude){
+        HashMap<City,Double> heuristic = new HashMap<>();
         for (LinkedList<City> cities : adjacencyList) {
             City current = cities.get(0);
             heuristic.put(current, euclideanDistance(current.getLatitude(), current.getLongitude(), latitude, longitude));
@@ -232,32 +323,45 @@ public class Search {
         return heuristic;
     }
 
-    public void aStar(HashMap<City,Float> heuristic , FileWriter writer, int startIndex,City destination) throws IOException {
-        int pathcost;
+    /**
+     * Performs a star search on the given input .
+     * @param heuristic heuristic used for a star search.
+     * @param writer used to write the output to the given file.
+     * @param start start country for the search.
+     * @param end end country for the search.
+     * @throws IOException if the writer object is not found.
+     */
+    public void aStar(HashMap<City,Double> heuristic , FileWriter writer, String start, String end) throws IOException {
+
+        int endIndex = indexFromLine(end);
+        int startIndex = indexFromLine(start);
+        if(startIndex!=-1 && endIndex !=-1){
+        Double pathCost;
         Comparator<City> nameComparator = Comparator.comparing(City::getPriority);
         PriorityQueue<City> pq = new PriorityQueue<>(heuristic.size(),nameComparator);
-        City start = adjacencyList.get(startIndex).get(0);
+        City startCity = adjacencyList.get(startIndex).get(0);
+        City destination = adjacencyList.get(endIndex).get(0);
         HashSet<City> set = new HashSet<>();
-        HashMap<City,Integer> pathCostMap = new HashMap<>();
+        HashMap<City,Double> pathCostMap = new HashMap<>();
         HashMap<City, City> pathMap = new HashMap<>();
-        pathMap.put(start,null);
+        pathMap.put(startCity,null);
         ArrayList<City> pathList = new ArrayList<>();
-        pathCostMap.put(start,0);
-        pq.add(start);
+        pathCostMap.put(startCity, 0.0);
+        pq.add(startCity);
 
         while(!(pq.isEmpty())){
             City current = pq.poll();
-            pathcost = pathCostMap.get(current);
+            pathCost = pathCostMap.get(current);
             if(current == destination ){
                 break;
             }
             int currentIndex = findIndex(current);
             if(!(adjacencyList.get(currentIndex).iterator().hasNext())) continue;
             for(City city: adjacencyList.get(currentIndex)){
-                if(city!=current && city!=start && set.add(city))
+                if(city!=current && city!=startCity && set.add(city))
                 {
-                    int cost = (int) (pathcost+calculateDistance(city,current));
-                    city.priority = (int) (cost+heuristic.get(city));
+                    double cost =  (pathCost+calculateDistance(city,current));
+                    city.priority =  (cost+heuristic.get(city));
                     pathMap.put(city,current);
                     pathCostMap.put(city,cost);
                     pq.add(city);
@@ -274,45 +378,71 @@ public class Search {
             writer.write(city.getName() +"\n");
         }
         writer.write("That took"+(pathList.size()-1)+"hops to find.\n");
-        writer.write("Total Distance = "+ pathCostMap.get(destination) +" miles." );
-        writer.flush();
+
+        writer.write("Total Distance = "+ Math.round(pathCostMap.get(destination)) +" miles." );
+        writer.flush();}
+        else{
+            if(startIndex==-1) System.err.println("No such city "+start);
+            else System.err.println("No such city "+end);
+            System.exit(0);
+        }
 
 
     }
 
-    public void performAStar(BufferedReader reader, FileWriter writer) throws IOException {
-        try {
+    /**
+     * performs A star search and writes the results to output file provided.
+     * @param input input file name.
+     * @param writer writes the output to the output file.
+     * @throws IOException  exception thrown if the writer object input output is not found.
+     */
+    public void performAStar(String input, FileWriter writer) throws IOException {
 
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(input));
             String start = reader.readLine();
-            int startIndex = indexFromLine(start);
             String end = reader.readLine();
             int endIndex = indexFromLine(end);
-            HashMap<City,Float> heuristic =createHeuristics(adjacencyList.get(endIndex).get(0).getLatitude(),adjacencyList.get(endIndex).get(0).getLongitude());
-            aStar(heuristic,writer,startIndex,adjacencyList.get(endIndex).get(0));
+            HashMap<City,Double> heuristic =createHeuristics(adjacencyList.get(endIndex).get(0).getLatitude(),adjacencyList.get(endIndex).get(0).getLongitude());
+            aStar(heuristic,writer,start,end);
 
             }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            catch (FileNotFoundException ignored){
+                System.err.println(" File not found: "+input);
+                System.exit(0);
         }
     }
-    public static void main(String[] args) throws IOException {
+
+    /**
+     * The driver code of the code calls in all the required methods in required chronology.
+     * @param args commandline arguments.
+     */
+    public static void main(String[] args) {
+
         if(args.length!=2){
 
-            System.out.println("Usage: java Search inputFile outputFile");
+            System.err.println("Usage: java Search inputFile outputFile");
+            System.exit(0);
         }
         else{
-            System.out.println(args[0]);
-            System.out.println(args[1]);
+            try{
             String input = args[0];
             String output = args[1];
             Search search = new Search();
             search.readCities();
             search.readEdges();
-            BufferedReader reader = new BufferedReader(new FileReader(input));
             FileWriter writer = new FileWriter(output);
             search.performBreadthFirstSearch(input,writer);
             search.performDepthFirstSearch(input,writer);
-            search.performAStar(reader,writer);
+            search.performAStar(input,writer);
+            }
+            catch (FileNotFoundException ignored){
+                System.err.println(" File not found: "+args[1]);
+                System.exit(0);
+            }
+             catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

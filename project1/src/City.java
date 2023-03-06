@@ -7,9 +7,9 @@ public class City  {
     String state;
     float latitude;
     float longitude;
-    int priority;
+    double priority;
 
-    public int getPriority() {
+    public double getPriority() {
         return priority;
     }
 
