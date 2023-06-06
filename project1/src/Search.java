@@ -63,7 +63,7 @@ public class Search {
      */
     public void readEdges(){
         try {
-            FileReader fr = new FileReader("C:\\Users\\Pradeep Gontla\\OneDrive - rit.edu\\Documents\\GitHub\\ArtificialIntelligence\\project1\\src\\edge.dat");
+            FileReader fr = new FileReader("edge.dat");
             BufferedReader bufferedReader = new BufferedReader(fr);
             String line = bufferedReader.readLine();
             while (line!=null){
@@ -86,7 +86,7 @@ public class Search {
      */
     public void readCities(){
         try {
-            FileReader fr = new FileReader("C:\\Users\\Pradeep Gontla\\OneDrive - rit.edu\\Documents\\GitHub\\ArtificialIntelligence\\project1\\src\\city.dat");
+            FileReader fr = new FileReader("city.dat");
             BufferedReader bufferedReader = new BufferedReader(fr);
             String line = bufferedReader.readLine();
             while (line != null) {
@@ -181,13 +181,13 @@ public class Search {
                 star = parentMap.get(star);
             }
             String distance = String.valueOf((int)round(findTheDistance(pathList)));
-            writer.write("\nDepth-First Search Results:\n");
+            writer.write("\n\n\nDepth-First Search Results:\n");
             for (City city : pathList) {
                 writer.write(city.name + "\n");
             }
             String hops = String.valueOf(pathList.size()-1);
-            writer.write("That took "+hops+ " hops to find"+"\n" );
-            writer.write("Total distance =  " + distance + " miles."+"\n");
+            writer.write("That took "+hops+ " hops to find."+"\n" );
+            writer.write("Total distance =  " + distance + " miles.");
             writer.flush();
 
         }
@@ -236,13 +236,20 @@ public class Search {
             }
             String distance = String.valueOf((int)round(findTheDistance(pathList)));
             writer.write("\nBreadth-First Search Results:\n");
+//            for (City city : pathList) {
+//                writer.write(city.name + "\n");
+//            }
+//            String hops = String.valueOf(pathList.size()-1);
+//            writer.write("That took "+hops+ " hops to find."+"\n" );
+//            writer.write("Total distance =  " + distance + " miles.");
+//            writer.flush();
             for (City city : pathList) {
-                writer.write(city.name + "\n");
+                writer.write(city.getName() + "\n");
             }
-            String hops = String.valueOf(pathList.size()-1);
-            writer.write("That took "+hops+ " hops to find"+"\n" );
-            writer.write("Total distance =  " + distance + " miles."+"\n");
+            writer.write("That took " + (pathList.size() - 1) + " hops to find.\n");
+            writer.write("Total distance = " + distance + " miles.");
             writer.flush();
+
         }
         else{
             if(startIndex==-1) System.err.println("No such city "+start);
@@ -304,7 +311,7 @@ public class Search {
      */
     public double euclideanDistance(float currentLatitude, float currentLongitude, float endLatitude, float endLongitude)
     {
-        return (double) Math.sqrt(Math.pow((endLatitude-currentLatitude),2)+Math.pow((endLongitude-currentLongitude),2));
+        return  Math.sqrt(Math.pow((endLatitude-currentLatitude),2)+Math.pow((endLongitude-currentLongitude),2));
 
     }
 
@@ -373,14 +380,14 @@ public class Search {
             pathList.add(0,star);
             star = pathMap.get(star);
         }
-        writer.write("\nA* Search Results:\n");
+        writer.write("\n\n\nA* Search Results:\n");
         for(City city:pathList){
             writer.write(city.getName() +"\n");
         }
         writer.write("That took"+(pathList.size()-1)+"hops to find.\n");
-
-        writer.write("Total Distance = "+ Math.round(pathCostMap.get(destination)) +" miles." );
-        writer.flush();}
+        writer.write("Total distance = "+ Math.round(pathCostMap.get(destination)) +" miles."+"\n\n" );
+        writer.flush();
+        }
         else{
             if(startIndex==-1) System.err.println("No such city "+start);
             else System.err.println("No such city "+end);
@@ -428,6 +435,21 @@ public class Search {
             try{
             String input = args[0];
             String output = args[1];
+            Scanner scanner = new Scanner(System.in);
+            if(args[0].equals("-") && args[1].equals("-")){
+                System.out.println("Enter the input file name: ");
+                input = scanner.nextLine();
+                System.out.println("Enter the output file name: ");
+                output = scanner.nextLine();
+            }
+            else if(args[0].equals("-")){
+                System.out.println("Enter the input file name: ");
+                input = scanner.nextLine();
+            }
+            else if(args[1].equals("-")){
+                System.out.println("Enter the output file name: ");
+                output = scanner.nextLine();
+            }
             Search search = new Search();
             search.readCities();
             search.readEdges();
@@ -445,5 +467,50 @@ public class Search {
             }
         }
     }
-}
+    public class City  {
+        public String getName() {
+            return name;
+        }
 
+        String name;
+        String state;
+        float latitude;
+        float longitude;
+        double priority;
+
+        public double getPriority() {
+            return priority;
+        }
+
+        public float getLatitude() {
+            return latitude;
+        }
+
+        public float getLongitude() {
+            return longitude;
+        }
+
+        public City(String line){
+            String[] arr =parseline(line);
+            this.name =arr[0];
+            this.state = arr[1];
+            this.latitude = Float.parseFloat(arr[2]);
+            this.longitude = Float.parseFloat(arr[3]);
+            this.priority = -1;
+        }
+        public String[] parseline(String line){
+            String[] splitter = line.split("\\s+");
+            return splitter;
+        }
+
+        @Override
+        public String toString() {
+            return "City{" +
+                    "name='" + name + '\'' +
+                    '}';
+        }
+
+
+
+    }
+}
